@@ -201,6 +201,9 @@
     <script src="bank_soal_fisika_inten.js"></script>
     <script src="bank_soal_kimia_inten.js"></script>
     <script src="bank_soal_matematika_baru.js"></script>
+    <script src="bank_soal_sejarah_inten.js"></script>
+    <script src="bank_soal_pkn_inten.js"></script>
+    <script src="bank_soal_sosiologi_inten.js"></script>
 
     <!-- System Core Logic -->
     <script>
@@ -221,7 +224,10 @@
             if (typeof dataMatematikaInten !== 'undefined') masterBankSoal.push(dataMatematikaInten);
             if (typeof dataFisikaInten !== 'undefined') masterBankSoal.push(dataFisikaInten);
             if (typeof dataKimiaInten !== 'undefined') masterBankSoal.push(dataKimiaInten);
-            if (typeof dataMatematikaBaru !== 'undefined') masterBankSoal.push(dataMatematikaBaru); // <-- Tambahkan baris ini
+            if (typeof dataMatematikaBaru !== 'undefined') masterBankSoal.push(dataMatematikaBaru);
+            if (typeof dataSejarahInten !== 'undefined') masterBankSoal.push(dataSejarahInten);
+            if (typeof dataPknInten !== 'undefined') masterBankSoal.push(dataPknInten);
+            if (typeof dataSosiologiInten !== 'undefined') masterBankSoal.push(dataSosiologiInten); // <-- Tambahkan baris ini
 
             renderDashboard();
             renderMath();
