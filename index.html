@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tryout TKA SMA 2025/2026 - Master System</title>
+    <title>MochaChino - Tryout TKA Interaktif</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- KaTeX untuk Formulas -->
@@ -20,10 +20,10 @@
     <header class="bg-teal-700 text-white shadow-lg sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="showDashboard()">
-                <span class="text-3xl">🥤</span>
+                <span class="text-3xl">☕</span>
                 <div>
                     <h1 class="text-lg font-bold">Tryout TKA Interaktif</h1>
-                    <p class="text-xs text-teal-200">Modul TKA SMA - Gelas Es Teh</p>
+                    <p class="text-xs text-teal-200">MochaChino</p>
                 </div>
             </div>
             <div class="flex items-center space-x-2">
@@ -44,22 +44,33 @@
 
         <!-- Dashboard / Pilih Mata Pelajaran -->
         <section id="screen-dashboard" class="space-y-6">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 text-center">
-                <h2 class="text-2xl font-bold text-slate-800 mb-2">Pilih Mata Pelajaran Tryout</h2>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 text-center space-y-4">
+                <h2 class="text-2xl font-bold text-slate-800">Pilih Mata Pelajaran Tryout</h2>
                 <p class="text-slate-600 text-sm max-w-2xl mx-auto">
-                    Pilih sub-materi di bawah untuk memulai latihan soal. Nilai pengerjaan akan disimpan secara
-                    otomatis.
+                    Pilih modul di bawah untuk memulai latihan soal. Nilai pengerjaan akan disimpan secara otomatis.
                 </p>
+
+                <!-- Search and Filter Bar -->
+                <div class="flex flex-col md:flex-row gap-3 justify-between items-center pt-2">
+                    <div class="relative w-full md:w-72">
+                        <input type="text" id="search-input" oninput="filterDashboard()"
+                            placeholder="Cari nama modul..."
+                            class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        <span class="absolute left-3 top-2.5 text-slate-400 text-sm">🔍</span>
+                    </div>
+
+                    <div id="category-tabs" class="flex flex-wrap gap-2 justify-center w-full md:w-auto">
+                    </div>
+                </div>
             </div>
 
-            <div id="subject-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                <!-- Subject Cards Injected Here -->
+            <!-- Grouped Sections Injected Here -->
+            <div id="subject-sections-container" class="space-y-8">
             </div>
         </section>
 
         <!-- Quiz Screen -->
         <section id="screen-quiz" class="hidden space-y-6">
-            <!-- Header Bar -->
             <div
                 class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center sticky top-16 z-40">
                 <div>
@@ -73,27 +84,21 @@
                 </div>
             </div>
 
-            <!-- Quiz Layout -->
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <!-- Question Area -->
                 <div class="lg:col-span-3 space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
-                        <!-- Stimulus -->
                         <div id="question-stimulus"
                             class="hidden text-sm text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-200 leading-relaxed max-h-80 overflow-y-auto space-y-2">
                         </div>
 
-                        <!-- Question -->
                         <div id="question-text" class="text-base md:text-lg font-semibold text-slate-800 leading-snug">
                             Loading Soal...
                         </div>
 
-                        <!-- Options -->
                         <div id="options-container" class="space-y-3 pt-2">
                         </div>
                     </div>
 
-                    <!-- Nav Controls -->
                     <div class="flex justify-between items-center">
                         <button id="btn-prev" onclick="prevQuestion()"
                             class="px-5 py-2.5 bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed">
@@ -110,7 +115,6 @@
                     </div>
                 </div>
 
-                <!-- Number Grid Panel -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 h-fit space-y-4">
                     <h4 class="text-sm font-bold text-slate-700 border-b pb-2">Navigasi Nomor Soal</h4>
                     <div id="number-grid" class="grid grid-cols-5 gap-2 max-h-80 overflow-y-auto p-1">
@@ -137,7 +141,7 @@
                 </div>
 
                 <div class="pt-4 flex flex-wrap gap-3 justify-center">
-                    <button onclick="showReview()"
+                    <button onclick="showReviewCurrent()"
                         class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-sm font-semibold rounded-xl transition">
                         📖 Lihat Pembahasan Lengkap
                     </button>
@@ -152,9 +156,12 @@
         <!-- Review Screen -->
         <section id="screen-review" class="hidden space-y-6">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-slate-800">Pembahasan Soal</h2>
-                <button onclick="showDashboard()" class="text-sm text-teal-600 font-semibold hover:underline">
-                    ← Kembali ke Dashboard
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Pembahasan Soal</h2>
+                    <p id="review-subject-title" class="text-xs text-slate-500 mt-0.5">Modul Tryout</p>
+                </div>
+                <button onclick="showHistory()" class="text-sm text-teal-600 font-semibold hover:underline">
+                    ← Kembali ke Rekap Nilai
                 </button>
             </div>
             <div id="review-container" class="space-y-6">
@@ -164,9 +171,9 @@
         <!-- History Screen -->
         <section id="screen-history" class="hidden space-y-6">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-slate-800">Riwayat Nilai Tryout</h2>
+                <h2 class="text-xl font-bold text-slate-800">Riwayat Nilai & Pembahasan</h2>
                 <button onclick="showDashboard()" class="text-sm text-teal-600 font-semibold hover:underline">
-                    ← Kembali
+                    ← Kembali ke Dashboard
                 </button>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -176,7 +183,8 @@
                             <th class="p-4">Tanggal Pengerjaan</th>
                             <th class="p-4">Mata Pelajaran</th>
                             <th class="p-4">Jawaban Benar</th>
-                            <th class="p-4 text-right">Skor Akhir</th>
+                            <th class="p-4">Skor</th>
+                            <th class="p-4 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="history-table-body" class="divide-y divide-slate-100">
@@ -184,323 +192,29 @@
                 </table>
             </div>
             <div class="text-right">
-                <button onclick="clearHistory()" class="text-xs text-rose-500 hover:underline">Clear History
+                <button onclick="clearHistory()" class="text-xs text-rose-500 hover:underline">Hapus Seluruh Riwayat
                     Data</button>
             </div>
         </section>
 
     </main>
 
-    <!-- Space Script: Import File Bank Soal Per Sub Materi -->
-    <script src="bank_soal_matematika.js"></script>
-    <script src="bank_soal_fisika.js"></script>
-    <script src="bank_soal_kimia.js"></script>
-    <script src="bank_soal_indonesia.js"></script>
-    <script src="bank_soal_inggris.js"></script>
-    <script src="bank_soal_matematika_inten.js"></script>
-    <script src="bank_soal_fisika_inten.js"></script>
-    <script src="bank_soal_kimia_inten.js"></script>
-    <script src="bank_soal_matematika_baru.js"></script>
-    <script src="bank_soal_sejarah_inten.js"></script>
-    <script src="bank_soal_pkn_inten.js"></script>
-    <script src="bank_soal_sosiologi_inten.js"></script>
+    <!-- Import File Bank Soal -->
+    <script src="bank_soal/bank_soal_matematika.js"></script>
+    <script src="bank_soal/bank_soal_fisika.js"></script>
+    <script src="bank_soal/bank_soal_kimia.js"></script>
+    <script src="bank_soal/bank_soal_indonesia_inten.js"></script>
+    <script src="bank_soal/bank_soal_inggris_inten.js"></script>
+    <script src="bank_soal/bank_soal_matematika_inten.js"></script>
+    <script src="bank_soal/bank_soal_fisika_inten.js"></script>
+    <script src="bank_soal/bank_soal_kimia_inten.js"></script>
+    <script src="bank_soal/bank_soal_matematika_baru.js"></script>
+    <script src="bank_soal/bank_soal_sejarah_inten.js"></script>
+    <script src="bank_soal/bank_soal_pkn_inten.js"></script>
+    <script src="bank_soal/bank_soal_sosiologi_inten.js"></script>
 
-    <!-- System Core Logic -->
-    <script>
-        let masterBankSoal = [];
-        let currentSubject = null;
-        let currentQuestions = [];
-        let currentIndex = 0;
-        let userAnswers = {};
-        let quizHistory = JSON.parse(localStorage.getItem('tka_master_history')) || [];
-
-        document.addEventListener("DOMContentLoaded", () => {
-            // Menggabungkan semua variabel dari file JS yang terload
-            if (typeof dataMatematika !== 'undefined') masterBankSoal.push(dataMatematika);
-            if (typeof dataFisika !== 'undefined') masterBankSoal.push(dataFisika);
-            if (typeof dataKimia !== 'undefined') masterBankSoal.push(dataKimia);
-            if (typeof dataIndonesia !== 'undefined') masterBankSoal.push(dataIndonesia);
-            if (typeof dataInggris !== 'undefined') masterBankSoal.push(dataInggris);
-            if (typeof dataMatematikaInten !== 'undefined') masterBankSoal.push(dataMatematikaInten);
-            if (typeof dataFisikaInten !== 'undefined') masterBankSoal.push(dataFisikaInten);
-            if (typeof dataKimiaInten !== 'undefined') masterBankSoal.push(dataKimiaInten);
-            if (typeof dataMatematikaBaru !== 'undefined') masterBankSoal.push(dataMatematikaBaru);
-            if (typeof dataSejarahInten !== 'undefined') masterBankSoal.push(dataSejarahInten);
-            if (typeof dataPknInten !== 'undefined') masterBankSoal.push(dataPknInten);
-            if (typeof dataSosiologiInten !== 'undefined') masterBankSoal.push(dataSosiologiInten); // <-- Tambahkan baris ini
-
-            renderDashboard();
-            renderMath();
-        });
-
-        function renderMath() {
-            setTimeout(() => {
-                if (window.renderMathInElement) {
-                    renderMathInElement(document.body, {
-                        delimiters: [
-                            { left: "$$", right: "$$", display: true },
-                            { left: "$", right: "$", display: false }
-                        ]
-                    });
-                }
-            }, 50);
-        }
-
-        function renderDashboard() {
-            const container = document.getElementById('subject-list');
-            container.innerHTML = '';
-
-            if (masterBankSoal.length === 0) {
-                container.innerHTML = `<div class="col-span-3 text-center py-10 text-slate-400">Belum ada file bank_soal_*.js yang terdeteksi.</div>`;
-                return;
-            }
-
-            masterBankSoal.forEach(sub => {
-                const card = document.createElement('div');
-                card.className = "bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-4";
-                card.onclick = () => startQuiz(sub.subjectId);
-                card.innerHTML = `
-                    <div class="flex items-center space-x-4">
-                        <span class="text-4xl">${sub.icon || '📚'}</span>
-                        <div>
-                            <h3 class="font-bold text-slate-800 text-lg">${sub.subjectName}</h3>
-                            <span class="text-xs text-teal-600 font-bold bg-teal-50 px-2.5 py-1 rounded-full">${sub.questions.length} Soal Tersedia</span>
-                        </div>
-                    </div>
-                    <button class="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl text-xs transition">
-                        Mulai Tryout →
-                    </button>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function startQuiz(subjectId) {
-            currentSubject = masterBankSoal.find(s => s.subjectId === subjectId);
-            currentQuestions = currentSubject.questions;
-            currentIndex = 0;
-            userAnswers = {};
-
-            document.getElementById('quiz-subject-tag').innerText = currentSubject.category;
-            document.getElementById('quiz-title').innerText = currentSubject.subjectName;
-
-            switchScreen('screen-quiz');
-            loadQuestion();
-            renderNumberGrid();
-        }
-
-        function loadQuestion() {
-            const q = currentQuestions[currentIndex];
-            document.getElementById('quiz-progress').innerText = `${currentIndex + 1} / ${currentQuestions.length}`;
-
-            const stimEl = document.getElementById('question-stimulus');
-            if (q.stimulus) {
-                stimEl.innerHTML = `<strong>Teks / Bacaan / Gambar:</strong><br>${q.stimulus}`;
-                stimEl.classList.remove('hidden');
-            } else {
-                stimEl.classList.add('hidden');
-            }
-
-            document.getElementById('question-text').innerHTML = `${currentIndex + 1}. ${q.question}`;
-
-            const optContainer = document.getElementById('options-container');
-            optContainer.innerHTML = '';
-
-            q.options.forEach((optText, idx) => {
-                const isSelected = userAnswers[currentIndex] === idx;
-                const optBtn = document.createElement('button');
-                optBtn.className = `w-full text-left p-4 rounded-xl border text-sm font-medium transition flex items-start space-x-3 ${isSelected
-                    ? 'border-teal-500 bg-teal-50/70 text-teal-900 shadow-sm'
-                    : 'border-slate-200 hover:border-slate-300 bg-white text-slate-700'
-                    }`;
-                optBtn.onclick = () => selectOption(idx);
-                optBtn.innerHTML = `
-                    <span class="w-6 h-6 rounded-full border text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${isSelected ? 'bg-teal-600 text-white border-teal-600' : 'border-slate-300 text-slate-500 bg-slate-50'
-                    }">${String.fromCharCode(65 + idx)}</span>
-                    <span class="leading-relaxed mt-0.5">${optText}</span>
-                `;
-                optContainer.appendChild(optBtn);
-            });
-
-            document.getElementById('btn-prev').disabled = currentIndex === 0;
-            if (currentIndex === currentQuestions.length - 1) {
-                document.getElementById('btn-next').classList.add('hidden');
-                document.getElementById('btn-submit').classList.remove('hidden');
-            } else {
-                document.getElementById('btn-next').classList.remove('hidden');
-                document.getElementById('btn-submit').classList.add('hidden');
-            }
-
-            renderNumberGrid();
-            renderMath();
-        }
-
-        function renderNumberGrid() {
-            const grid = document.getElementById('number-grid');
-            grid.innerHTML = '';
-
-            currentQuestions.forEach((_, idx) => {
-                const isAnswered = userAnswers.hasOwnProperty(idx);
-                const isCurrent = idx === currentIndex;
-
-                const btn = document.createElement('button');
-                btn.className = `h-9 w-full rounded-lg font-bold text-xs flex items-center justify-center border transition ${isCurrent
-                    ? 'ring-2 ring-teal-600 border-teal-600 bg-teal-50 text-teal-800'
-                    : isAnswered
-                        ? 'bg-teal-600 text-white border-teal-600'
-                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                    }`;
-                btn.innerText = idx + 1;
-                btn.onclick = () => {
-                    currentIndex = idx;
-                    loadQuestion();
-                };
-                grid.appendChild(btn);
-            });
-        }
-
-        function selectOption(index) {
-            userAnswers[currentIndex] = index;
-            loadQuestion();
-        }
-
-        function prevQuestion() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                loadQuestion();
-            }
-        }
-
-        function nextQuestion() {
-            if (currentIndex < currentQuestions.length - 1) {
-                currentIndex++;
-                loadQuestion();
-            }
-        }
-
-        function finishQuiz() {
-            if (Object.keys(userAnswers).length < currentQuestions.length) {
-                if (!confirm(`Anda baru menjawab ${Object.keys(userAnswers).length} dari ${currentQuestions.length} soal. Yakin ingin mengirimkan?`)) {
-                    return;
-                }
-            }
-
-            let correctCount = 0;
-            currentQuestions.forEach((q, idx) => {
-                if (userAnswers[idx] === q.correct) {
-                    correctCount++;
-                }
-            });
-
-            const score = Math.round((correctCount / currentQuestions.length) * 100);
-
-            const record = {
-                date: new Date().toLocaleString('id-ID'),
-                subject: currentSubject.subjectName,
-                score: score,
-                correct: correctCount,
-                total: currentQuestions.length
-            };
-            quizHistory.unshift(record);
-            localStorage.setItem('tka_master_history', JSON.stringify(quizHistory));
-
-            document.getElementById('final-score').innerText = score;
-            document.getElementById('score-summary').innerText = `Menjawab ${correctCount} dari ${currentQuestions.length} soal dengan benar`;
-
-            switchScreen('screen-result');
-        }
-
-        function showReview() {
-            const container = document.getElementById('review-container');
-            container.innerHTML = '';
-
-            currentQuestions.forEach((q, idx) => {
-                const userAns = userAnswers[idx];
-                const isCorrect = userAns === q.correct;
-
-                const card = document.createElement('div');
-                card.className = "bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4";
-                card.innerHTML = `
-                    <div class="flex justify-between items-start border-b pb-3">
-                        <span class="text-xs font-bold text-slate-400">Soal #${idx + 1}</span>
-                        <span class="px-2.5 py-1 rounded-full text-xs font-bold ${isCorrect ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-rose-50 text-rose-600 border border-rose-200'
-                    }">
-                            ${isCorrect ? '✓ Jawaban Benar' : '✕ Jawaban Salah/Kosong'}
-                        </span>
-                    </div>
-
-                    ${q.stimulus ? `<div class="text-xs text-slate-600 bg-slate-50 p-3.5 rounded-xl border border-slate-200">${q.stimulus}</div>` : ''}
-
-                    <div class="text-sm font-semibold text-slate-800">${q.question}</div>
-
-                    <div class="space-y-2 pt-2">
-                        ${q.options.map((opt, oIdx) => {
-                        let optStyle = "border-slate-100 bg-slate-50 text-slate-600";
-                        if (oIdx === q.correct) {
-                            optStyle = "border-emerald-300 bg-emerald-50/70 text-emerald-900 font-semibold";
-                        } else if (oIdx === userAns && !isCorrect) {
-                            optStyle = "border-rose-300 bg-rose-50/70 text-rose-900 font-semibold";
-                        }
-                        return `
-                                <div class="p-3 rounded-xl border text-xs flex items-center space-x-2 ${optStyle}">
-                                    <span class="font-bold">${String.fromCharCode(65 + oIdx)}.</span>
-                                    <span>${opt}</span>
-                                </div>
-                            `;
-                    }).join('')}
-                    </div>
-
-                    <div class="bg-teal-50/60 border border-teal-100 p-4 rounded-xl text-xs text-teal-950 leading-relaxed">
-                        <span class="font-bold block text-teal-800 mb-1">💡 Kunci & Pembahasan:</span>
-                        ${q.rationale}
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-
-            switchScreen('screen-review');
-            renderMath();
-        }
-
-        function showHistory() {
-            const tableBody = document.getElementById('history-table-body');
-            tableBody.innerHTML = '';
-
-            quizHistory.forEach(item => {
-                const row = document.createElement('tr');
-                row.className = "hover:bg-slate-50";
-                row.innerHTML = `
-                    <td class="p-4 text-xs text-slate-500">${item.date}</td>
-                    <td class="p-4 font-semibold text-slate-800">${item.subject}</td>
-                    <td class="p-4 text-slate-600">${item.correct} / ${item.total}</td>
-                    <td class="p-4 text-right font-bold text-teal-600">${item.score}</td>
-                `;
-                tableBody.appendChild(row);
-            });
-
-            switchScreen('screen-history');
-        }
-
-        function clearHistory() {
-            if (confirm("Apakah Anda yakin ingin menghapus seluruh riwayat nilai?")) {
-                quizHistory = [];
-                localStorage.removeItem('tka_master_history');
-                showHistory();
-            }
-        }
-
-        function switchScreen(screenId) {
-            ['screen-dashboard', 'screen-quiz', 'screen-result', 'screen-review', 'screen-history'].forEach(id => {
-                document.getElementById(id).classList.add('hidden');
-            });
-            document.getElementById(screenId).classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function showDashboard() {
-            switchScreen('screen-dashboard');
-        }
-    </script>
+    <!-- Import Logic Core yang Dipisah -->
+    <script src="script.js"></script>
 </body>
 
 </html>
