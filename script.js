@@ -55,11 +55,10 @@ function renderCategoryTabs() {
 
     categories.forEach(cat => {
         const btn = document.createElement('button');
-        btn.className = `px-3 py-1.5 rounded-xl text-xs font-semibold transition border ${
-            activeCategory === cat
+        btn.className = `px-3 py-1.5 rounded-xl text-xs font-semibold transition border ${activeCategory === cat
                 ? 'bg-teal-600 text-white border-teal-600 shadow-sm'
                 : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-        }`;
+            }`;
         btn.innerText = cat === 'all' ? '✨ Semua' : cat;
         btn.onclick = () => {
             activeCategory = cat;
@@ -347,33 +346,103 @@ function renderReviewScreen(questions, answers, subjectName) {
 }
 
 function showHistory() {
-    const tableBody = document.getElementById('history-table-body');
-    tableBody.innerHTML = '';
+    const container = document.getElementById('screen-history');
+    if (!container) return;
+
+    // Render ulang seluruh bagian rekap nilai agar responsif di HP & Desktop
+    let historyHTML = `
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-slate-800">Riwayat Nilai & Pembahasan</h2>
+            <button onclick="showDashboard()" class="text-sm text-teal-600 font-semibold hover:underline">
+                ← Kembali ke Dashboard
+            </button>
+        </div>
+    `;
 
     if (quizHistory.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Belum ada riwayat pengerjaan tryout.</td></tr>`;
+        historyHTML += `
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center text-slate-400">
+                Belum ada riwayat pengerjaan tryout.
+            </div>
+        `;
     } else {
-        quizHistory.forEach(item => {
-            const row = document.createElement('tr');
-            row.className = "hover:bg-slate-50";
-            row.innerHTML = `
-                <td class="p-4 text-xs text-slate-500">${item.date}</td>
-                <td class="p-4 font-semibold text-slate-800">${item.subject}</td>
-                <td class="p-4 text-slate-600">${item.correct} / ${item.total}</td>
-                <td class="p-4 font-bold text-teal-600">${item.score}</td>
-                <td class="p-4 text-center">
-                    ${item.questions ? `
-                        <button onclick="showReviewByHistoryId(${item.id})"
-                            class="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg transition">
-                            📖 Pembahasan
-                        </button>
-                    ` : `<span class="text-xs text-slate-400">-</span>`}
-                </td>
-            `;
-            tableBody.appendChild(row);
-        });
+        // Tampilan 1: Tabel untuk Layar Komputer / Desktop (hidden di HP)
+        historyHTML += `
+            <div class="hidden md:block bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-4">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 uppercase text-[11px] tracking-wider border-b">
+                            <th class="p-4">Tanggal Pengerjaan</th>
+                            <th class="p-4">Mata Pelajaran</th>
+                            <th class="p-4">Jawaban Benar</th>
+                            <th class="p-4">Skor</th>
+                            <th class="p-4 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        ${quizHistory.map(item => `
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-4 text-xs text-slate-500">${item.date}</td>
+                                <td class="p-4 font-semibold text-slate-800">${item.subject}</td>
+                                <td class="p-4 text-slate-600">${item.correct} /${item.total}</td>
+                                <td class="p-4 font-bold text-teal-600">${item.score}</td>
+                                <td class="p-4 text-center">
+                                    ${item.questions ? `
+                                        <button onclick="showReviewByHistoryId(${item.id})"
+                                            class="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg transition">
+                                            📖 Pembahasan
+                                        </button>
+                                    ` : `<span class="text-xs text-slate-400">-</span>`}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        // Tampilan 2: Kartu (Card) Khusus untuk Layar HP / Mobile (hidden di Desktop)
+        historyHTML += `
+            <div class="block md:hidden space-y-3 mb-4">
+                ${quizHistory.map(item => `
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="flex justify-between items-start border-b border-slate-100 pb-2">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm leading-snug">${item.subject}</h4>
+                                <span class="text-[10px] text-slate-400 block mt-0.5">${item.date}</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-lg font-extrabold text-teal-600 block">${item.score}</span>
+                                <span class="text-[10px] text-slate-500">${item.correct}/${item.total} Benar</span>
+                            </div>
+                        </div>
+                        <div class="pt-1">
+                            ${item.questions ? `
+                                <button onclick="showReviewByHistoryId(${item.id})"
+                                    class="w-full py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl transition flex items-center justify-center space-x-1.5">
+                                    <span>📖</span>
+                                    <span>Lihat Pembahasan Soal</span>
+                                </button>
+                            ` : `
+                                <span class="text-xs text-slate-400 text-center block">Pembahasan Tidak Tersedia</span>
+                            `}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
     }
 
+    // Tombol Hapus Riwayat
+    historyHTML += `
+        <div class="text-right">
+            <button onclick="clearHistory()" class="text-xs text-rose-500 hover:underline">
+                Hapus Seluruh Riwayat Data
+            </button>
+        </div>
+    `;
+
+    container.innerHTML = historyHTML;
     switchScreen('screen-history');
 }
 
