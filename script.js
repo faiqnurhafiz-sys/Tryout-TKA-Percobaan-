@@ -21,6 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (typeof dataSosiologiInten !== 'undefined') masterBankSoal.push(dataSosiologiInten);
     if (typeof dataBahasaIndonesiaInten !== 'undefined') masterBankSoal.push(dataBahasaIndonesiaInten);
     if (typeof dataBahasaInggrisInten !== 'undefined') masterBankSoal.push(dataBahasaInggrisInten);
+    if (typeof dataBahasaIndonesia !== 'undefined') masterBankSoal.push(dataBahasaIndonesia);
+    if (typeof dataBahasaInggris !== 'undefined') masterBankSoal.push(dataBahasaInggris);
 
     renderCategoryTabs();
     renderDashboard();
@@ -56,8 +58,8 @@ function renderCategoryTabs() {
     categories.forEach(cat => {
         const btn = document.createElement('button');
         btn.className = `px-3 py-1.5 rounded-xl text-xs font-semibold transition border ${activeCategory === cat
-                ? 'bg-teal-600 text-white border-teal-600 shadow-sm'
-                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+            ? 'bg-teal-600 text-white border-teal-600 shadow-sm'
+            : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
             }`;
         btn.innerText = cat === 'all' ? '✨ Semua' : cat;
         btn.onclick = () => {
